@@ -1,0 +1,21 @@
+service: challenge-p4-production-service
+
+frameworkVersion: ^3.35.2
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+
+functions:
+  api:
+    timeout: 30
+    handler: dist/src/main.handler
+    events:
+      - httpApi:
+          path: /{proxy+}
+          method: ANY
+
+package:
+  exclude:
+    - .env

@@ -1,0 +1,60 @@
+-- CreateEnum
+CREATE TYPE "ProductCategoryEnum" AS ENUM ('BURGER', 'PIZZA', 'SANDWICH', 'DRINK', 'DESSERT', 'SNACK');
+
+-- CreateEnum
+CREATE TYPE "OrderStatusEnum" AS ENUM ('RECEIVED', 'IN_PREPARATION', 'READY', 'FINALIZED', 'CANCELLED');
+
+-- CreateEnum
+CREATE TYPE "PaymentStatusEnum" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
+
+-- CreateTable
+CREATE TABLE "TB_CLIENTS" (
+    "id" UUID NOT NULL,
+    "name" TEXT NOT NULL,
+    "cpf" TEXT NOT NULL,
+
+    CONSTRAINT "TB_CLIENTS_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TB_ORDERS" (
+    "id" UUID NOT NULL,
+    "clientId" UUID NOT NULL,
+    "total" DOUBLE PRECISION NOT NULL,
+    "status" "OrderStatusEnum" NOT NULL DEFAULT 'RECEIVED',
+    "paymentStatus" "PaymentStatusEnum" NOT NULL DEFAULT 'PENDING',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "TB_ORDERS_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TB_PRODUCTS" (
+    "id" UUID NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "price" DOUBLE PRECISION NOT NULL,
+    "category" "ProductCategoryEnum" NOT NULL,
+
+    CONSTRAINT "TB_PRODUCTS_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TB_PRODUCTS_ORDERS" (
+    "orderId" UUID NOT NULL,
+    "productId" UUID NOT NULL,
+
+    CONSTRAINT "TB_PRODUCTS_ORDERS_pkey" PRIMARY KEY ("orderId","productId")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TB_CLIENTS_cpf_key" ON "TB_CLIENTS"("cpf");
+
+-- AddForeignKey
+ALTER TABLE "TB_ORDERS" ADD CONSTRAINT "TB_ORDERS_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "TB_CLIENTS"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TB_PRODUCTS_ORDERS" ADD CONSTRAINT "TB_PRODUCTS_ORDERS_productId_fkey" FOREIGN KEY ("productId") REFERENCES "TB_PRODUCTS"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TB_PRODUCTS_ORDERS" ADD CONSTRAINT "TB_PRODUCTS_ORDERS_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "TB_ORDERS"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
