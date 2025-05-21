@@ -1,10 +1,10 @@
-import {OrderEntity} from "@/domain/entities/order.entity";
+import {OrderEntity, OrderProps} from "@/domain/entities/order.entity";
 import {ClientModelMapper} from "@/infrastructure/repositories/prisma/models/client-model.mapper";
 import {PaymentStatusEnum} from "@/domain/enums/payment-status.enum";
 import {OrderStatusEnum} from "@/domain/enums/order-status.enum";
 
 export class OrderModelMapper {
-    static toEntity(model: any & { products: any, client: any }): OrderEntity {
+    static toEntity(model): OrderEntity {
         return new OrderEntity({
             id: model.id,
             clientId: model.clientId,
@@ -16,7 +16,7 @@ export class OrderModelMapper {
         });
     }
 
-    static paymentStatusToEntity(model: any) {
+    static paymentStatusToEntity(model: { id: string, paymentStatus: string }) {
         return {
             id: model.id,
             paymentStatus: PaymentStatusEnum[model.paymentStatus],
