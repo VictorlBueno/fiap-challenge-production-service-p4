@@ -1,5 +1,5 @@
 import { IProductRepository } from "@/domain/repositories/product.repository";
-import { ProductEntity } from "@/domain/entities/product.entity";
+import {ProductEntity, ProductProps} from "@/domain/entities/product.entity";
 import { PrismaService } from "@/infrastructure/shared/database/prisma/prisma.service";
 import { ProductModelMapper } from "@/infrastructure/repositories/prisma/models/product-model.mapper";
 
@@ -14,7 +14,7 @@ export class ProductPrismaRepository implements IProductRepository {
 
     async findAll(): Promise<ProductEntity[]> {
         const products = await this.prismaService.product.findMany();
-        return products.map(item => ProductModelMapper.toEntity(item));
+        return products.map(item => ProductModelMapper.toEntity(item as unknown as ProductProps));
     }
 
     async findById(id: string): Promise<ProductEntity | null> {
@@ -22,7 +22,7 @@ export class ProductPrismaRepository implements IProductRepository {
             where: { id },
         });
 
-        return product ? ProductModelMapper.toEntity(product) : null;
+        return product ? ProductModelMapper.toEntity(product as unknown as ProductProps) : null;
     }
 
     async insert(entity: ProductEntity): Promise<void> {
@@ -44,7 +44,7 @@ export class ProductPrismaRepository implements IProductRepository {
             },
         });
 
-        return products.map(item => ProductModelMapper.toEntity(item));
+        return products.map(item => ProductModelMapper.toEntity(item as unknown as ProductProps));
     }
 
     async update(entity: ProductEntity): Promise<void> {
