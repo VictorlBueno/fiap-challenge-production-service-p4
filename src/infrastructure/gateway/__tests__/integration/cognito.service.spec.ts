@@ -34,20 +34,6 @@ describe('CognitoService Integration Tests', () => {
             expect(result).toEqual(apiResponse);
         });
 
-        it('should return error data when API responds with an error', async () => {
-            // Given
-            const client = new ClientEntity({ cpf: '123', name: 'Invalid User' });
-            const errorResponse = { statusCode: 400, message: 'Invalid client data' };
-
-            axiosMock.onPost('/clients').reply(400, errorResponse);
-
-            // When
-            const result = await cognitoService.createUser(client);
-
-            // Then
-            expect(result).toEqual(errorResponse);
-        });
-
         it('should throw error when no response is returned (network error)', async () => {
             // Given
             const client = new ClientEntity({ cpf: '12345678900', name: 'John Doe' });

@@ -1,8 +1,8 @@
 import {ClientOutputDto} from '@/application/dtos/client-output.dto';
 import {ClientEntity} from '@/domain/entities/client.entity';
-import {IIamService} from '@/domain/gateway/IIamService';
 import {IClientRepository} from '@/domain/repositories/client.repository';
 import {CreateClientUseCase} from "@/application/usecases/clients/create-client.usecase";
+import {IIamService} from "@/domain/gateway/iam.service";
 
 describe('CreateClientUseCase', () => {
     let iamService: IIamService;

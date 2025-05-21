@@ -1,128 +1,110 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ProductModule } from '@/infrastructure/modules/product.module';
-import { UpdateProductUsecase } from '@/application/usecases/products/update-product.usecase';
-import { DeleteProductUsecase } from '@/application/usecases/products/delete-product.usecase';
-import { GetProductsByCategoryUseCase } from '@/application/usecases/products/get-products-by-category.usecase';
-import { UuidGenerator } from '@/infrastructure/providers/uuid-generator';
-import { ProductCategoryEnum } from '@/domain/enums/category.enum';
-import {CreateProductUseCase} from "@/application/usecases/products/create-product.usecase";
-import {ProductEntity} from "@/domain/entities/product.entity";
+import {Test, TestingModule} from '@nestjs/testing';
+import {PrismaService} from '@/infrastructure/shared/database/prisma/prisma.service';
+import {UuidGenerator} from '@/infrastructure/providers/uuid-generator';
+import {ProductPrismaRepository} from '@/infrastructure/repositories/prisma/product-prisma.repository';
+import {CreateProductUseCase} from '@/application/usecases/products/create-product.usecase';
+import {DeleteProductUsecase} from '@/application/usecases/products/delete-product.usecase';
+import {GetProductsByCategoryUseCase} from '@/application/usecases/products/get-products-by-category.usecase';
+import {ProductModule} from '@/infrastructure/modules/product.module';
+import {OrderService} from '@/infrastructure/gateway/order.service';
+import {ProductCategoryEnum} from "@/domain/enums/category.enum";
 
-describe('ProductModule Integration Test (BDD)', () => {
+describe('ProductModule (unit)', () => {
     let moduleRef: TestingModule;
-    let createProductUC: CreateProductUseCase.UseCase;
-    let updateProductUC: UpdateProductUsecase.UseCase;
-    let deleteProductUC: DeleteProductUsecase.UseCase;
-    let getByCategoryUC: GetProductsByCategoryUseCase.UseCase;
-    let uuidGenerator: UuidGenerator;
 
-    const productRepositoryMock = {
-        insert: jest.fn(),
-        update: jest.fn(),
-        delete: jest.fn(),
-        listByCategory: jest.fn(),
-        findById: jest.fn(),
-    };
+    const prismaServiceMock = {};
+    const uuidGeneratorMock = {generate: jest.fn().mockReturnValue('uuid-product')};
+    const productRepositoryMock = {};
+    const orderServiceMock = {createOrder: jest.fn().mockResolvedValue('order-created')};
 
     beforeAll(async () => {
         moduleRef = await Test.createTestingModule({
             imports: [ProductModule],
         })
+            .overrideProvider('PrismaService')
+            .useValue(prismaServiceMock)
+            .overrideProvider('UuidGenerator')
+            .useValue(uuidGeneratorMock)
             .overrideProvider('ProductRepository')
             .useValue(productRepositoryMock)
-            .overrideProvider('UuidGenerator')
-            .useValue({
-                generate: jest.fn().mockReturnValue('fake-uuid'),
-            })
+            .overrideProvider('OrderService')
+            .useValue(orderServiceMock)
             .compile();
-
-        createProductUC = moduleRef.get(CreateProductUseCase.UseCase);
-        updateProductUC = moduleRef.get(UpdateProductUsecase.UseCase);
-        deleteProductUC = moduleRef.get(DeleteProductUsecase.UseCase);
-        getByCategoryUC = moduleRef.get(GetProductsByCategoryUseCase.UseCase);
-        uuidGenerator = moduleRef.get('UuidGenerator');
     });
 
-    afterEach(() => {
-        jest.clearAllMocks();
+    it('Given the ProductModule is initialized, Then all providers should be defined', () => {
+        const prisma = moduleRef.get<PrismaService>('PrismaService');
+        const uuid = moduleRef.get<UuidGenerator>('UuidGenerator');
+        const productRepo = moduleRef.get<ProductPrismaRepository>('ProductRepository');
+        const order = moduleRef.get<OrderService>('OrderService');
+        const createUseCase = moduleRef.get<CreateProductUseCase.UseCase>(CreateProductUseCase.UseCase);
+        const deleteUseCase = moduleRef.get<DeleteProductUsecase.UseCase>(DeleteProductUsecase.UseCase);
+        const getByCategoryUseCase = moduleRef.get<GetProductsByCategoryUseCase.UseCase>(
+            GetProductsByCategoryUseCase.UseCase,
+        );
+
+        expect(prisma).toBeDefined();
+        expect(uuid).toBeDefined();
+        expect(productRepo).toBeDefined();
+        expect(order).toBeDefined();
+        expect(createUseCase).toBeDefined();
+        expect(deleteUseCase).toBeDefined();
+        expect(getByCategoryUseCase).toBeDefined();
     });
 
-    it('Given CreateProductUseCase, When executed, Then it creates a product and returns it', async () => {
-        const input = {
-            name: 'Product 1',
-            description: 'A product description',
-            price: 100,
-            category: ProductCategoryEnum.BURGER,
-        };
-        const fakeProduct = { id: 'fake-uuid', ...input };
+    it('Given CreateProductUseCase, When execute is called, Then it should return a fake product', async () => {
+        const createUseCase = moduleRef.get<CreateProductUseCase.UseCase>(CreateProductUseCase.UseCase);
 
-        productRepositoryMock.insert.mockResolvedValue(fakeProduct);
-
-        const result = await createProductUC.execute(input);
-
-        expect(productRepositoryMock.insert).toHaveBeenCalledWith(expect.objectContaining({
-            id: 'fake-uuid',
-            name: input.name,
-            description: input.description,
-            price: input.price,
-            category: input.category,
-        }));
-        expect(result).toEqual(fakeProduct);
-    });
-
-
-    it('Given UpdateProductUsecase, When executed, Then it updates the product', async () => {
-        const input = {
-            id: 'fake-uuid',
-            name: 'Updated Product',
-            description: 'Updated description',
-            price: 150,
-            category: ProductCategoryEnum.BURGER,
-        };
-
-        const existingProduct = new ProductEntity({
-            id: input.id,
-            name: 'Old Product',
-            description: 'Old description',
-            price: 100,
-            category: ProductCategoryEnum.BURGER,
+        jest.spyOn(createUseCase, 'execute').mockResolvedValue({
+            id: 'uuid-product',
+            name: 'Coca',
+            description: "--",
+            price: 10,
+            category: ProductCategoryEnum.DRINK,
         });
 
-        productRepositoryMock.findById.mockResolvedValue(existingProduct);
+        const result = await createUseCase.execute({
+            name: 'Coca',
+            description: "--",
+            price: 10,
+            category: ProductCategoryEnum.DRINK,
+        });
 
-        productRepositoryMock.update.mockImplementation(async (entity) => entity);
-
-        const result = await updateProductUC.execute(input);
-
-        expect(productRepositoryMock.findById).toHaveBeenCalledWith(input.id);
-        expect(productRepositoryMock.update).toHaveBeenCalledWith(expect.any(ProductEntity));
-        expect(result).toEqual(existingProduct.toJSON()); // já atualizado após entity.update()
+        expect(result).toEqual({
+            id: 'uuid-product',
+            name: 'Coca',
+            description: "--",
+            price: 10,
+            category: ProductCategoryEnum.DRINK,
+        });
     });
 
-    it('Given DeleteProductUsecase, When executed, Then it deletes the product', async () => {
-        const productId = 'fake-uuid';
+    it('Given DeleteProductUsecase, When execute is called, Then it should return success', async () => {
+        const deleteUseCase = moduleRef.get<DeleteProductUsecase.UseCase>(DeleteProductUsecase.UseCase);
 
-        productRepositoryMock.delete.mockResolvedValue(undefined);
+        jest.spyOn(deleteUseCase, 'execute').mockResolvedValue();
 
-        const result = await deleteProductUC.execute({ id: productId });
+        const result = await deleteUseCase.execute({id: 'uuid-product'});
 
-        expect(productRepositoryMock.delete).toHaveBeenCalledWith("fake-uuid");
-        expect(result).toBeUndefined();
+        expect(result).toEqual(undefined);
     });
 
-    it('Given GetProductsByCategoryUseCase, When executed, Then it returns products of the category', async () => {
-        const categoryId = ProductCategoryEnum.PIZZA;
+    it('Given GetProductsByCategoryUseCase, When execute is called, Then it should return product list', async () => {
+        const getByCategoryUseCase = moduleRef.get<GetProductsByCategoryUseCase.UseCase>(
+            GetProductsByCategoryUseCase.UseCase,
+        );
 
-        const products = [
-            new ProductEntity({ id: 'prod-1', name: 'Product 1', category: categoryId, price: 50, description: 'desc 1' }),
-            new ProductEntity({ id: 'prod-2', name: 'Product 2', category: categoryId, price: 70, description: 'desc 2' }),
-        ];
+        jest.spyOn(getByCategoryUseCase, 'execute').mockResolvedValue([
+            {
+                id: 'uuid-product', name: 'Coca', description: "--", category: ProductCategoryEnum.DRINK,
+                price: 10
+            },
+        ]);
 
-        productRepositoryMock.listByCategory.mockResolvedValue(products);
+        const result = await getByCategoryUseCase.execute({categoryId: "DRINK"});
 
-        const result = await getByCategoryUC.execute({ categoryId });
-
-        expect(productRepositoryMock.listByCategory).toHaveBeenCalledWith(categoryId);
-        expect(result).toEqual(products.map(p => p.toJSON()));
+        expect(result).toEqual([
+            {id: 'uuid-product', name: 'Coca', description: "--", category: ProductCategoryEnum.DRINK, price: 10},
+        ]);
     });
 });

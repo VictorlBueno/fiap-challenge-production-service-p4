@@ -42,13 +42,13 @@ describe('CreateOrderUseCase', () => {
     describe('when input is invalid', () => {
         it('should throw BadRequestError if clientId is missing', async () => {
             await expect(
-                useCase.execute({ clientId: '', products: [], host: 'http://localhost' })
+                useCase.execute({ clientId: '', products: []})
             ).rejects.toThrow(BadRequestError);
         });
 
         it('should throw BadRequestError if products list is empty', async () => {
             await expect(
-                useCase.execute({ clientId: 'client-1', products: [], host: 'http://localhost' })
+                useCase.execute({ clientId: 'client-1', products: []})
             ).rejects.toThrow(BadRequestError);
         });
     });
@@ -57,8 +57,13 @@ describe('CreateOrderUseCase', () => {
         it('should create an order and return expected output', async () => {
             const input: CreateOrderUseCase.Input = {
                 clientId: 'client-1',
-                products: ['prod-1', 'prod-2'],
-                host: 'http://localhost',
+                products: [{
+                    id: 'prod-1',
+                    name: 'Burger',
+                    description: 'Delicious burger',
+                    price: 20,
+                    category: ProductCategoryEnum.BURGER,
+                }],
             };
 
             const mockProducts = [
@@ -86,19 +91,20 @@ describe('CreateOrderUseCase', () => {
 
             const output = await useCase.execute(input);
 
-            expect(productRepository.findById).toHaveBeenCalledTimes(2);
+            expect(productRepository.findById).toHaveBeenCalledTimes(0);
             expect(orderRepository.insert).toHaveBeenCalledWith(expect.any(OrderEntity));
-            expect(output.id).toBe('uuid-1234');
-            expect(output.products).toHaveLength(2);
-            expect(output.clientId).toBe('client-1');
-            expect(output.paymentLink).toBe('http://localhost/paymock/uuid-1234');
         });
 
         it('should ignore invalid product IDs', async () => {
             const input: CreateOrderUseCase.Input = {
                 clientId: 'client-1',
-                products: ['valid-id', 'invalid-id'],
-                host: 'http://localhost',
+                products: [{
+                    id: 'prod-1',
+                    name: 'Burger',
+                    description: 'Delicious burger',
+                    price: 20,
+                    category: ProductCategoryEnum.BURGER,
+                }],
             };
 
             const validProduct = new ProductEntity({
@@ -117,8 +123,7 @@ describe('CreateOrderUseCase', () => {
 
             const output = await useCase.execute(input);
 
-            expect(output.products).toHaveLength(1);
-            expect(output.products[0].id).toBe('valid-id');
+            expect(output).toStrictEqual({message: "Success!"});
         });
     });
 });

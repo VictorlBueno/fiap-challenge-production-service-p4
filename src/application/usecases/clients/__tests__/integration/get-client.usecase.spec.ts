@@ -1,7 +1,7 @@
 import { ClientOutputDto } from '@/application/dtos/client-output.dto';
-import { IIamService } from '@/domain/gateway/IIamService';
 import { BadRequestError } from '@/application/shared/errors/bad-request-error';
 import {GetClientUseCase} from "@/application/usecases/clients/get-client.usecase";
+import {IIamService} from "@/domain/gateway/iam.service";
 
 describe('GetClientUseCase', () => {
     let iamService: IIamService;

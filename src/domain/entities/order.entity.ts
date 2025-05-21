@@ -38,7 +38,7 @@ export class OrderEntity extends Entity<OrderProps> {
         return this.props.clientId;
     }
 
-    private set clientId(clientId: string) {
+    set clientId(clientId: string) {
         this.props.clientId = clientId;
     }
 
@@ -46,7 +46,7 @@ export class OrderEntity extends Entity<OrderProps> {
         return this.props.total;
     }
 
-    private set total(total: number) {
+    set total(total: number) {
         this.props.total = total;
     }
 
@@ -54,7 +54,7 @@ export class OrderEntity extends Entity<OrderProps> {
         return this.props.status;
     }
 
-    private set status(status: OrderStatusEnum) {
+    set status(status: OrderStatusEnum) {
         this.props.status = status;
     }
 
@@ -62,7 +62,7 @@ export class OrderEntity extends Entity<OrderProps> {
         return this.props.createdAt;
     }
 
-    private set createdAt(createdAt: Date) {
+    set createdAt(createdAt: Date) {
         this.props.createdAt = createdAt;
     }
 
@@ -70,7 +70,7 @@ export class OrderEntity extends Entity<OrderProps> {
         return this.props.paymentStatus;
     }
 
-    private set paymentStatus(paymentStatus: PaymentStatusEnum) {
+    set paymentStatus(paymentStatus: PaymentStatusEnum) {
         this.props.paymentStatus = paymentStatus;
     }
 

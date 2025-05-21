@@ -4,7 +4,6 @@ import { CreateOrderUseCase } from '@/application/usecases/orders/create-orders.
 import { UpdateOrderUseCase } from '@/application/usecases/orders/update-order.usecase';
 import { GetOrderPaymentStatusUseCase } from '@/application/usecases/orders/get-order-payment-status.usecase';
 import { GetOrdersUseCase } from '@/application/usecases/orders/get-orders.usecase';
-import { Request } from 'express';
 import { NotFoundException } from '@nestjs/common';
 import {OrderStatusEnum} from "@/domain/enums/order-status.enum";
 import {PaymentStatusEnum} from "@/domain/enums/payment-status.enum";
@@ -38,52 +37,25 @@ describe('OrderController - Integration', () => {
     describe('POST /orders - create()', () => {
         it('should create a new order with host info and return the result', async () => {
             // Given
-            const dto = {
+            const dto: CreateOrderUseCase.Input = {
                 clientId: 'client123',
-                products: ['prod1', 'prod2'],
-            };
-            const req = {
-                protocol: 'http',
-                get: jest.fn().mockReturnValue('localhost:3000'),
-            } as unknown as Request;
-
-            const expectedResult = {
-                id: 'order123',
-                clientId: 'client123',
-                products: [
-                    {
-                        id: 'prod1',
-                        name: 'Burguer',
-                        description: 'Descrição do produto 1',
-                        price: 100,
-                        category: ProductCategoryEnum.BURGER,
-                        productId: 'prod1',
-                        quantity: 2,
-                    },
-                ],
-                total: 200,
-                status: OrderStatusEnum.IN_PREPARATION,
-                paymentStatus: PaymentStatusEnum.APPROVED,
-                paymentLink: 'http://payment.example',
-                createdAt: new Date(),
-                client: {
-                    id: 'client123',
-                    name: 'John Doe',
-                    cpf: '123.456.789-00'
-                }
+                products: [{
+                    id: "string",
+                    name: "string",
+                    price: 0,
+                    description: "string",
+                    category: ProductCategoryEnum.BURGER
+                }],
             };
 
-            jest.spyOn(createOrderUseCase, 'execute').mockResolvedValue(expectedResult);
+            jest.spyOn(createOrderUseCase, 'execute').mockResolvedValue({message: "Success!"});
 
             // When
-            const result = await controller.create(dto, req);
+            const result = await controller.create(dto);
 
             // Then
-            expect(createOrderUseCase.execute).toHaveBeenCalledWith({
-                ...dto,
-                host: 'http://localhost:3000',
-            });
-            expect(result).toEqual(expectedResult);
+            expect(createOrderUseCase.execute).toHaveBeenCalledWith(dto);
+            expect(result).toEqual({message: "Success!"});
         });
     });
 

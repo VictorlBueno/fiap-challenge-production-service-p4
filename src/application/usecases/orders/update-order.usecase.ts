@@ -8,8 +8,8 @@ import {OrderStatusEnum} from "@/domain/enums/order-status.enum";
 export namespace UpdateOrderUseCase {
     export type Input = {
         id: string;
-        paymentStatus: PaymentStatusEnum;
-        status: OrderStatusEnum;
+        paymentStatus?: PaymentStatusEnum;
+        status?: OrderStatusEnum;
     };
 
     export type Output = OrderOutputDto;

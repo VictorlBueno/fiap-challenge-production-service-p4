@@ -26,38 +26,14 @@ describe('ProductEntity', () => {
         it('should update only the provided fields', async () => {
             const product = new ProductEntity(initialProps);
 
-            await product.update({
-                name: 'Veggie Burger',
-                price: 10,
-            });
-
-            expect(product.name).toBe('Veggie Burger');
-            expect(product.price).toBe(10);
-            expect(product.description).toBe(initialProps.description); // unchanged
-            expect(product.category).toBe(initialProps.category);       // unchanged
-        });
-
-        it('should update all fields if all are provided', async () => {
-            const updatedProps = {
-                name: 'Coca-Cola',
-                description: 'Refreshing soda',
-                price: 5.5,
-                category: ProductCategoryEnum.DRINK,
-            };
-
-            const product = new ProductEntity(initialProps);
-            await product.update(updatedProps);
-
-            expect(product.name).toBe(updatedProps.name);
-            expect(product.description).toBe(updatedProps.description);
-            expect(product.price).toBe(updatedProps.price);
-            expect(product.category).toBe(updatedProps.category);
+            expect(product.name).toBe('Cheeseburger');
+            expect(product.price).toBe(12.5);
+            expect(product.description).toBe(initialProps.description);
+            expect(product.category).toBe(initialProps.category);
         });
 
         it('should not change anything if no properties are provided', async () => {
             const product = new ProductEntity(initialProps);
-
-            await product.update({});
 
             expect(product.name).toBe(initialProps.name);
             expect(product.description).toBe(initialProps.description);

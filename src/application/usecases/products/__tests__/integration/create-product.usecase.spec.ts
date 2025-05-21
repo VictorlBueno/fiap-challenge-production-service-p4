@@ -1,12 +1,13 @@
-import { BadRequestError } from "@/application/shared/errors/bad-request-error";
+import { CreateProductUseCase } from "@/application/usecases/products/create-product.usecase";
 import { ProductCategoryEnum } from "@/domain/enums/category.enum";
+import { BadRequestError } from "@/application/shared/errors/bad-request-error";
 import { ProductEntity } from "@/domain/entities/product.entity";
-import {CreateProductUseCase} from "@/application/usecases/products/create-product.usecase";
 
 describe("CreateProductUseCase - Integration Test", () => {
     let useCase: CreateProductUseCase.UseCase;
     let productRepositoryMock: any;
     let uuidGeneratorMock: any;
+    let orderServiceMock: any;
 
     beforeEach(() => {
         productRepositoryMock = {
@@ -17,54 +18,56 @@ describe("CreateProductUseCase - Integration Test", () => {
             generate: jest.fn(),
         };
 
-        useCase = new CreateProductUseCase.UseCase(productRepositoryMock, uuidGeneratorMock);
+        orderServiceMock = {
+            generate: jest.fn(),
+            addNewProduct: jest.fn(),
+        };
+
+        useCase = new CreateProductUseCase.UseCase(
+            productRepositoryMock,
+            uuidGeneratorMock,
+            orderServiceMock
+        );
     });
 
-    describe("execute()", () => {
-        it("should throw BadRequestError if any input data is missing", async () => {
-            // Given: missing name
-            const incompleteInput = {
+    describe("Given missing input data", () => {
+        it("When executing use case Then should throw BadRequestError", async () => {
+            const input = {
                 name: "",
-                description: "desc",
+                description: "some description",
                 price: 10,
                 category: ProductCategoryEnum.BURGER,
             };
 
-            // When & Then
-            await expect(useCase.execute(incompleteInput)).rejects.toThrow(BadRequestError);
-            await expect(useCase.execute(incompleteInput)).rejects.toThrow("Input data not provided");
+            await expect(useCase.execute(input)).rejects.toThrow(BadRequestError);
+            await expect(useCase.execute(input)).rejects.toThrow("Input data not provided");
         });
+    });
 
-        it("should create product and return ProductOutputDto", async () => {
-            // Given
+    describe("Given valid input data", () => {
+        it("When executing use case Then should create product and return output", async () => {
             const input = {
-                name: "Product 1",
-                description: "Description 1",
-                price: 100,
+                name: "Product Name",
+                description: "Product Description",
+                price: 50,
                 category: ProductCategoryEnum.BURGER,
             };
 
-            const generatedId = "uuid-1234";
-            uuidGeneratorMock.generate.mockReturnValue(generatedId);
+            const generatedId = "generated-uuid";
 
+            uuidGeneratorMock.generate.mockReturnValue(generatedId);
             productRepositoryMock.insert.mockResolvedValue(undefined);
 
-            const toJSONSpy = jest.spyOn(ProductEntity.prototype, "toJSON").mockReturnValue({
-                id: generatedId,
-                ...input,
-            });
+            const toJSONSpy = jest
+                .spyOn(ProductEntity.prototype, "toJSON")
+                .mockReturnValue({ id: generatedId, ...input });
 
-            // When
             const result = await useCase.execute(input);
 
-            // Then
             expect(uuidGeneratorMock.generate).toHaveBeenCalled();
             expect(productRepositoryMock.insert).toHaveBeenCalled();
             expect(toJSONSpy).toHaveBeenCalled();
-            expect(result).toEqual({
-                id: generatedId,
-                ...input,
-            });
+            expect(result).toEqual({ id: generatedId, ...input });
 
             toJSONSpy.mockRestore();
         });

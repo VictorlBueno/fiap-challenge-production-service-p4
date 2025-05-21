@@ -4,7 +4,6 @@ import * as request from 'supertest';
 
 import { ProductController } from '@/infrastructure/controllers/product.controller';
 import { CreateProductUseCase } from '@/application/usecases/products/create-product.usecase';
-import { UpdateProductUsecase } from '@/application/usecases/products/update-product.usecase';
 import { DeleteProductUsecase } from '@/application/usecases/products/delete-product.usecase';
 import { GetProductsByCategoryUseCase } from '@/application/usecases/products/get-products-by-category.usecase';
 import { ProductCategoryEnum } from '@/domain/enums/category.enum';
@@ -23,7 +22,6 @@ describe('ProductController (integration)', () => {
             controllers: [ProductController],
             providers: [
                 { provide: CreateProductUseCase.UseCase, useValue: createProductUseCase },
-                { provide: UpdateProductUsecase.UseCase, useValue: updateProductUseCase },
                 { provide: DeleteProductUsecase.UseCase, useValue: deleteProductUseCase },
                 { provide: GetProductsByCategoryUseCase.UseCase, useValue: getProductByCategoryUseCase },
             ],
@@ -60,33 +58,6 @@ describe('ProductController (integration)', () => {
 
             expect(createProductUseCase.execute).toHaveBeenCalledWith(createDto);
             expect(response.body).toEqual(createdProduct);
-        });
-    });
-
-    describe('PUT /products/:id - update()', () => {
-        it('should update a product and return the updated product', async () => {
-            const id = 'uuid-123';
-            const updateDto = {
-                name: 'Updated Burger',
-                price: 10.99,
-                description: 'Updated tasty burger',
-                category: ProductCategoryEnum.BURGER,
-            };
-
-            const updatedProduct = {
-                id,
-                ...updateDto,
-            };
-
-            updateProductUseCase.execute.mockResolvedValue(updatedProduct);
-
-            const response = await request(app.getHttpServer())
-                .put(`/products/${id}`)
-                .send(updateDto)
-                .expect(HttpStatus.OK);
-
-            expect(updateProductUseCase.execute).toHaveBeenCalledWith({ id, ...updateDto });
-            expect(response.body).toEqual(updatedProduct);
         });
     });
 
