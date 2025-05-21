@@ -56,6 +56,9 @@ jobs:
       - name: Build NestJS
         run: nest build
 
+      - name: Generate prisma
+        run: npm run prisma:generate
+
       - name: Set AWS CLI credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
