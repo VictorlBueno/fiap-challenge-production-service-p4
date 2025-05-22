@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Inject, Param, Post} from "@nestjs/common";
+import {Body, Controller, Get, Param, Post} from "@nestjs/common";
 import {ApiTags, ApiOperation, ApiResponse, ApiParam} from "@nestjs/swagger";
 import {CreateClientUseCase} from "@/application/usecases/clients/create-client.usecase";
 import {GetClientUseCase} from "@/application/usecases/clients/get-client.usecase";

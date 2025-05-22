@@ -7,7 +7,9 @@ export namespace DeleteProductUsecase {
         id?: string;
     };
 
-    export type Output = void;
+    export type Output = {
+        message: string;
+    };
 
     export class UseCase implements DefaultUseCase<Input, Output> {
         constructor(
@@ -23,6 +25,10 @@ export namespace DeleteProductUsecase {
             }
 
             await this.productRepository.delete(id);
+
+            return {
+                message: "Success!",
+            }
         }
     }
 }
