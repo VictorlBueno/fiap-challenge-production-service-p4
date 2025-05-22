@@ -82,7 +82,7 @@ describe('ProductModule (unit)', () => {
     it('Given DeleteProductUsecase, When execute is called, Then it should return success', async () => {
         const deleteUseCase = moduleRef.get<DeleteProductUsecase.UseCase>(DeleteProductUsecase.UseCase);
 
-        jest.spyOn(deleteUseCase, 'execute').mockResolvedValue();
+        jest.spyOn(deleteUseCase, 'execute').mockResolvedValue(undefined);
 
         const result = await deleteUseCase.execute({id: 'uuid-product'});
 
