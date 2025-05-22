@@ -31,7 +31,7 @@ describe("DeleteProductUsecase - Integration Test", () => {
             productRepositoryMock.delete.mockResolvedValue(undefined);
 
             // When
-            await expect(useCase.execute(input)).resolves.toBeUndefined();
+            await expect(useCase.execute(input)).resolves.toStrictEqual({message: "Success!"});
 
             // Then
             expect(productRepositoryMock.delete).toHaveBeenCalledWith("product-123");
