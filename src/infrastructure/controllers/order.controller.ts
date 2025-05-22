@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, Post, Put, Req} from "@nestjs/common";
+import {Body, Controller, Get, Param, Post, Put} from "@nestjs/common";
 import {ApiOperation, ApiParam, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {UpdateOrderUseCase} from "@/application/usecases/orders/update-order.usecase";
 import {UpdateOrderDto} from "@/infrastructure/dtos/update-order.dto";

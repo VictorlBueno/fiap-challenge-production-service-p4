@@ -1,4 +1,4 @@
-import {OrderEntity, OrderProps} from "@/domain/entities/order.entity";
+import {OrderEntity} from "@/domain/entities/order.entity";
 import {ClientModelMapper} from "@/infrastructure/repositories/prisma/models/client-model.mapper";
 import {PaymentStatusEnum} from "@/domain/enums/payment-status.enum";
 import {OrderStatusEnum} from "@/domain/enums/order-status.enum";

@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, HttpCode, Param, Post, Put} from "@nestjs/common";
+import {Body, Controller, Delete, Get, HttpCode, Param, Post} from "@nestjs/common";
 import {ApiOperation, ApiParam, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {CreateProductUseCase} from "@/application/usecases/products/create-product.usecase";
 import {GetProductsByCategoryUseCase} from "@/application/usecases/products/get-products-by-category.usecase";
